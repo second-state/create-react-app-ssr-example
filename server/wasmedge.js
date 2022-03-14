@@ -1,5 +1,6 @@
 import * as React from 'react';
 import ReactDOMServer from 'react-dom/server';
+import * as std from 'std';
 import * as http from 'wasi_http';
 import * as net from 'wasi_net';
 
@@ -30,15 +31,20 @@ async function handle_client(cs) {
 
 async function handle_req(s, req) {
 	print('uri:', req.uri)
+
 	let resp = new http.WasiResponse();
+	let content = '';
 	if (req.uri == '/') {
 		const app = ReactDOMServer.renderToString(<App />);
-		resp.headers = {
-			"Content-Type": "text/html; charset=utf-8"
-		}
-		let r = resp.encode(app);
-		s.write(r);
+		content = std.loadFile('./build/index.html');
+		content = content.replace('<div id="root"></div>', `<div id="root">${app}</div>`);
+	} else if (req.uri.indexOf('/static') === 0) {
+		content = std.loadFile('./build' + req.uri);
+	} else {
+		content = std.loadFile('./public' + req.uri);
 	}
+	let r = resp.encode(content);
+	s.write(r);
 }
 
 async function server_start() {
