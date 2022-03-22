@@ -29,6 +29,12 @@ async function handle_client(cs) {
 	print('end:', cs.peer());
 }
 
+function enlargeArray(oldArr, newLength) {
+	let newArr = new Uint8Array(newLength);
+	oldArr && newArr.set(oldArr, 0);
+	return newArr;
+}
+
 async function handle_req(s, req) {
 	print('uri:', req.uri)
 
@@ -38,11 +44,40 @@ async function handle_req(s, req) {
 		const app = ReactDOMServer.renderToString(<App />);
 		content = std.loadFile('./build/index.html');
 		content = content.replace('<div id="root"></div>', `<div id="root">${app}</div>`);
-	} else if (req.uri.indexOf('/static') === 0) {
-		content = std.loadFile('./build' + req.uri);
 	} else {
-		content = std.loadFile('./public' + req.uri);
+		let chunk = 1000; // Chunk size of each reading
+		let length = 0; // The whole length of the file
+		let byteArray = null; // File content as Uint8Array
+		
+		// Read file into byteArray by chunk
+		let file = std.open('./build' + req.uri, 'r');
+		while (true) {
+			byteArray = enlargeArray(byteArray, length + chunk);
+			let readLen = file.read(byteArray.buffer, length, chunk);
+			length += readLen;
+			if (readLen < chunk) {
+				break;
+			}
+		}
+		content = byteArray.slice(0, length).buffer;
+		file.close();
 	}
+	let contentType = 'text/html; charset=utf-8';
+	if (req.uri.endsWith('.css')) {
+		contentType = 'text/css; charset=utf-8';
+	} else if (req.uri.endsWith('.js')) {
+		contentType = 'text/javascript; charset=utf-8';
+	} else if (req.uri.endsWith('.json')) {
+		contentType = 'text/json; charset=utf-8';
+	} else if (req.uri.endsWith('.ico')) {
+		contentType = 'image/vnd.microsoft.icon';
+	} else if (req.uri.endsWith('.png')) {
+		contentType = 'image/png';
+	}
+	resp.headers = {
+		'Content-Type': contentType
+	};
+
 	let r = resp.encode(content);
 	s.write(r);
 }
