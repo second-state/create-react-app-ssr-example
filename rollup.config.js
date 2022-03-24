@@ -24,7 +24,7 @@ module.exports = [
 			file: 'server-build/index.js',
 			format: 'esm',
 		},
-		external: [ 'std', 'wasi_net','wasi_http'],
+		external: [ 'std', 'process', 'wasi_net','wasi_http'],
 		plugins: [
 			plugin_async(),
 			babel(babelOptions),

@@ -3,6 +3,7 @@ import ReactDOMServer from 'react-dom/server';
 import * as std from 'std';
 import * as http from 'wasi_http';
 import * as net from 'wasi_net';
+import * as process from 'process';
 
 import App from '../src/App.js';
 
@@ -83,9 +84,10 @@ async function handle_req(s, req) {
 }
 
 async function server_start() {
-	print('listen 8002...');
+	let port = process.env.PORT || '8002';
+	print(`listen ${port}...`);
 	try {
-		let s = new net.WasiTcpServer(8002);
+		let s = new net.WasiTcpServer(parseInt(port));
 		for (var i = 0; ; i++) {
 			let cs = await s.accept();
 			handle_client(cs);

@@ -5,7 +5,8 @@ module.exports = {
 	externals: [
 		{"wasi_http": "wasi_http"},
 		{"wasi_net": "wasi_net"},
-		{"std": "std"}
+		{"std": "std"},
+		{"process": "process"}
 	],
 	output: {
 		path: path.resolve('server-build'),
