@@ -15,7 +15,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev:build-server": "NODE_ENV=development webpack --config webpack-wasmedge.server.js --mode=development",
+    "build-server": "NODE_ENV=development webpack --config webpack-wasmedge.server.js --mode=development",
     "rollup:build-server": "rollup -c rollup.config.js",
     "dev:start": "nodemon ./server-build/index.js",
     "dev": "npm-run-all --parallel build dev:*"
