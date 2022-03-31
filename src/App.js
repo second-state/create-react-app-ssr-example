@@ -18,6 +18,7 @@ function App() {
         >
           Learn React
         </a>
+        <div className="powered-by">Powered by <a href="https://wasmedge.org" target="_blank">WasmEdge</a></div>
       </header>
     </div>
   );
